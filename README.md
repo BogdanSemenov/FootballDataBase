@@ -15,52 +15,109 @@
 
 ### Описание таблиц
  1. Лиги, в которых играют футбольные команды.
- 
- Поля в таблице : id(PK); страна; название лиги.
- Каждая команда состоит только в одной лиге.
-  В данной таблице 5 полей.
-  
-  ```SQL
-  Create Table();
-  ```
+   
+ ```SQL
+  CREATE TABLE League (
+	id_league int PRIMARY KEY,
+	Country varchar(30) NOT NULL,
+	Name varchar(30) NOT NULL
+);
+```
+ В данной таблице после заполнения содержится 5 полей.
  
  2. Стадионы, на которых играют команды.
  
- У каждой команды есть свой стадион. 
- Содержит поля : id(PK); имя стадиона; страна; вместимость стадиона.
- В данной таблице 7 полей.
+ ```SQL
+ CREATE TABLE Stadium (
+	id_stadium int PRIMARY KEY,
+	Name varchar(30) NOT NULL,
+	Country varchar(30) NOT NULL,
+	Capacity int NOT NULL
+);
+```
+ В данной таблице после заполнения содержится 7 полей.
  
  3. Команды, которые участвуют в турнире.
  
- Содержит поля : id(PK); название; Имя тренера; Страна; Стадион(FK); Лига(FK); Кол-во фанатов.
-  В данной таблице 7 полей.
+```SQL
+CREATE TABLE Team (
+	id_team int PRIMARY KEY,
+	Name varchar(30) NOT NULL,
+	Trainer varchar(30),
+	Country varchar(30) NOT NULL,
+	Stadium int NOT NULL REFERENCES Stadium(id_stadium),
+	League int NOT NULL REFERENCES League(id_league),
+	Fans int
+);
+```
+
+В данной таблице после заполнения содержится 7 полей.
  
  4. Игроки, участвующие в турнире.
  
- Содержит поля : id(PK); имя игрока; Страна, из которой игрок родом; зарплата.
-  В данной таблице 14 полей.
+```SQL
+CREATE TABLE Players (
+	id_player int PRIMARY KEY,
+	Name varchar(30) NOT NULL,
+	Country varchar(30) NOT NULL,
+	Salary int NOT NULL
+);
+```
+В данной таблице после заполнения содержится 14 полей.
  
  5. Судьи, которые принимают участие в матчах турнира.
- 
- Содержит поля : id(PK); Зарплата; Страна; Имя.
-  В данной таблице 4 поля.
+
+```SQL
+CREATE TABLE Judge (
+	id_judge int PRIMARY KEY,
+	Salary int NOT NULL,
+	Country varchar(30) NOT NULL,
+	Name varchar(30) NOT NULL
+);
+```
+В данной таблице после заполнения содержится 4 поля.
  
  6. Матчи, проходящие на данном турнире.
  
- Содержит поля : id(PK); Стадион(FK); Команда, играющая на своём стадионе(FK); Гостевая команда(FK);
- Судья(FK); Лига(FK).
-  В данной таблице 3 поля.
+ ```SQL
+ CREATE TABLE Game (
+  id_game int PRIMARY KEY,
+	Stadium int NOT NULL REFERENCES Stadium(id_stadium),
+	Home_team int NOT NULL REFERENCES Team(id_team),
+	Guest_team int NOT NULL REFERENCES Team(id_team),
+	Judge int NOT NULL REFERENCES Judge(id_judge),
+	League int NOT NULL REFERENCES League(id_league)
+);
+```
+В данной таблице после заполнения содержится 3 поля.
 
  7. Статистики матчей, проводящихся на турнире.
  
- Содержит поля : Счёт; кол-во фолов; кол-во угловых; владение мячом(%); удары в створ ворот; Игра(PK).
-  В данной таблице 3 поля.
+```SQL
+CREATE TABLE Game_statistic (
+	Score varchar(10) NOT NULL,
+	Fouls_amount int NOT NULL,
+	Corners int NOT NULL,
+	Possession varchar(10) NOT NULL,
+	Hits_on_target varchar(10) NOT NULL,
+	Game int REFERENCES Game(id_game),
+	PRIMARY KEY (Game)
+);
+```
+В данной таблице после заполнения содержится 3 поля.
 
  8. Таблица-связка между игроками и командами.
  
- Содержит поля : id_player(PK), id_team(FK), Дата начала контракта игрока с клубом(PK); 
- Дата окончания контракта с клубом.
-  В данной таблице 14 полей.
+ ```SQL
+ CREATE TABLE Players_Teams (
+	id_player int REFERENCES Players(id_player),
+	id_team int NOT NULL REFERENCES Team(id_team),
+	DateStart DATE,
+	DateEnd DATE,
+	PRIMARY KEY(id_player, DateStart)
+);
+```
+В данной таблице после заполнения содержится 14 полей.
 
 ### Описание запросов
  
@@ -86,9 +143,36 @@
  
  1.  Функция на вход принимает id_team, а возвращает её название.
  
+ ```SQL
+ CREATE OR REPLACE FUNCTION
+Team_name (input_id_team int)
+	RETURNS varchar(30) AS $$
+ DECLARE team_name varchar(30);
+ BEGIN
+  ...
+  CODE
+  ...
+ END;
+   $$ LANGUAGE plpgsql;
+```
+ 
  Очень часто нужно знать именно название команды, а не id.
  
  2.  Подаётся на вход id_team. Функция возвращает имена игроков этой команды и их страны.
+ 
+ ```SQL
+ CREATE OR REPLACE FUNCTION
+Players_from_team(input_id_team int)
+RETURNS TABLE(
+  player varchar(30),
+  Country_player varchar(30) ) AS $$
+  BEGIN
+  ...
+  CODE
+  ...
+ END;
+   $$ LANGUAGE plpgsql;
+ ```
  
  Функция нужна для понимания, насколько команда мильтинациональная. В некоторых лигах
  существует правило лимита на легионеров. Эта функция может показать превышен ли лимит.
