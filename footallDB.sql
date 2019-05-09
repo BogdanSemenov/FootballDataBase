@@ -3,14 +3,14 @@ CREATE schema IF NOT EXISTS football_tournament;
 SET search_path = football_tournament, public;
 
 CREATE TABLE League (
-	id_league int NOT NULL PRIMARY KEY,
+	id_league int PRIMARY KEY,
 	Country varchar(30) NOT NULL,
 	Name varchar(30) NOT NULL
 );
 
 
 CREATE TABLE Stadium (
-	id_stadium int NOT NULL PRIMARY KEY,
+	id_stadium int PRIMARY KEY,
 	Name varchar(30) NOT NULL,
 	Country varchar(30) NOT NULL,
 	Capacity int NOT NULL
@@ -19,17 +19,17 @@ CREATE TABLE Stadium (
 
 CREATE TABLE Team (
 	id_team int PRIMARY KEY,
-	Name varchar(30),
+	Name varchar(30) NOT NULL,
 	Trainer varchar(30),
-	Country varchar(30),
-	Stadium int REFERENCES Stadium(id_stadium),
-	League int REFERENCES League(id_league),
+	Country varchar(30) NOT NULL,
+	Stadium int NOT NULL REFERENCES Stadium(id_stadium),
+	League int NOT NULL REFERENCES League(id_league),
 	Fans int
 );
 
 
 CREATE TABLE Players (
-	id_player int NOT NULL PRIMARY KEY,
+	id_player int PRIMARY KEY,
 	Name varchar(30) NOT NULL,
 	Country varchar(30) NOT NULL,
 	Salary int NOT NULL
@@ -37,7 +37,7 @@ CREATE TABLE Players (
 
 
 CREATE TABLE Judge (
-	id_judge int NOT NULL PRIMARY KEY,
+	id_judge int PRIMARY KEY,
 	Salary int NOT NULL,
 	Country varchar(30) NOT NULL,
 	Name varchar(30) NOT NULL
@@ -45,7 +45,7 @@ CREATE TABLE Judge (
 
 
 CREATE TABLE Game (
-  id_game int NOT NULL PRIMARY KEY,
+  id_game int PRIMARY KEY,
 	Stadium int NOT NULL REFERENCES Stadium(id_stadium),
 	Home_team int NOT NULL REFERENCES Team(id_team),
 	Guest_team int NOT NULL REFERENCES Team(id_team),
@@ -55,9 +55,9 @@ CREATE TABLE Game (
 
 
 CREATE TABLE Players_Teams (
-	id_player int NOT NULL REFERENCES Players(id_player),
+	id_player int REFERENCES Players(id_player),
 	id_team int NOT NULL REFERENCES Team(id_team),
-	DateStart DATE NOT NULL,
+	DateStart DATE,
 	DateEnd DATE,
 	PRIMARY KEY(id_player, DateStart)
 );
@@ -69,7 +69,7 @@ CREATE TABLE Game_statistic (
 	Corners int NOT NULL,
 	Possession varchar(10) NOT NULL,
 	Hits_on_target varchar(10) NOT NULL,
-	Game int NOT NULL REFERENCES Game(id_game),
+	Game int REFERENCES Game(id_game),
 	PRIMARY KEY (Game)
 );
 
