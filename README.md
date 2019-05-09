@@ -139,6 +139,23 @@ CREATE TABLE Game_statistic (
 
  1. Триггер, который при добавлении в таблицу нового стадиона, сразу добавляет его в команду.
  
+ ```SQL
+ CREATE OR REPLACE FUNCTION new_stadium() RETURNS TRIGGER
+AS $$
+  BEGIN
+    INSERT INTO Team(id_team, Stadium) VALUES (new.id_stadium, new.id_stadium);
+
+    RETURN new;
+	END;
+  $$ LANGUAGE plpgsql;
+  ```
+  
+  ```SQL
+  CREATE TRIGGER tr_new_stadium AFTER INSERT ON Stadium
+  FOR EACH ROW EXECUTE PROCEDURE new_stadium();
+  ```
+  
+ 
  ### Описание функций 
  
  1.  Функция на вход принимает id_team, а возвращает её название.
@@ -150,7 +167,7 @@ Team_name (input_id_team int)
  DECLARE team_name varchar(30);
  BEGIN
   ...
-  CODE
+  YOUR CODE
   ...
  END;
    $$ LANGUAGE plpgsql;
@@ -168,7 +185,7 @@ RETURNS TABLE(
   Country_player varchar(30) ) AS $$
   BEGIN
   ...
-  CODE
+  YOUR CODE
   ...
  END;
    $$ LANGUAGE plpgsql;
@@ -176,3 +193,25 @@ RETURNS TABLE(
  
  Функция нужна для понимания, насколько команда мильтинациональная. В некоторых лигах
  существует правило лимита на легионеров. Эта функция может показать превышен ли лимит.
+ 
+ ### Описание ролей
+ 
+ 1. Роль предназначена только для выполнения запросов.
+ 
+ ```SQL
+ CREATE ROLE only_reading
+	WITH LOGIN PASSWORD 'your password';
+
+GRANT SELECT ON ALL TABLES IN SCHEMA football_tournament
+	TO only_reading;
+```
+
+2. Роль, права которой распространяются на все операции с данными таблицами.
+
+```SQL
+CREATE ROLE super_developer
+	WITH LOGIN PASSWORD 'your password';
+
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA football_tournament
+	TO super_developer;
+```
