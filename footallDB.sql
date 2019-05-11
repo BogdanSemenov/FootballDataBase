@@ -331,14 +331,14 @@ INNER JOIN Judge J ON G.Judge = J.id_judge
 -- Выводит топ5 по зарплате игроков, их страну, зарплату
 CREATE VIEW topSalaries AS
 	(
-		SELECT *
-		FROM (SELECT Name,
-								 Country,
-								 Salary,
-								 row_number() OVER (ORDER BY Salary DESC)
-									 AS top_5
-					FROM Players) AS Q
-		WHERE top_5 < 6
+	SELECT *
+	FROM (SELECT Name,
+		     Country,
+		     Salary,
+		     row_number() OVER (ORDER BY Salary DESC)
+		     AS top_5
+	      FROM Players) AS Q
+	WHERE top_5 < 6
 	);
 
 SELECT *
@@ -350,12 +350,12 @@ SELECT *
 --Выводит ироков из Англии, их нынешний Клуб и дату начала карьеры в этом клубе
 CREATE VIEW EnglishPlayers AS
 	(
-		SELECT P.Name, T.Name as Team, PT.DateStart
-		FROM Team T
-					 INNER JOIN Players_Teams PT on T.id_team = PT.id_team
-					 INNER JOIN Players P on PT.id_player = P.id_player
-	  WHERE P.Country = 'England'
-	    AND PT.DateEnd is NULL
+	SELECT P.Name, T.Name as Team, PT.DateStart
+	FROM Team T
+	 INNER JOIN Players_Teams PT on T.id_team = PT.id_team
+	 INNER JOIN Players P on PT.id_player = P.id_player
+  	WHERE P.Country = 'England'
+    	 AND PT.DateEnd is NULL
 	);
 
 -- DROP VIEW EnglishPlayers;
@@ -363,12 +363,6 @@ CREATE VIEW EnglishPlayers AS
 
 SELECT *
 	FROM EnglishPlayers;
-
-
-
-/* 05.05-Раздаем роли и права(2-3 роли)
-12.05 - 13.05 - сдача проекта (word)*/
-
 
 
 -- триггер, который при добавлении в таблицу нового стадиона, сразу добавляет его в команду
