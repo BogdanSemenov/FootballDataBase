@@ -150,9 +150,13 @@ Team_name (input_id_team int)
 	RETURNS varchar(30) AS $$
  DECLARE team_name varchar(30);
  BEGIN
-  ...
-  YOUR CODE
-  ...
+  IF input_id_team NOT IN (SELECT id_team FROM Team) THEN
+			RAISE EXCEPTION 'This Team does not exist';
+  END IF;
+ SELECT Team.Name INTO team_name
+   FROM Team
+ WHERE id_team = $1;
+ RETURN team_name;
  END;
    $$ LANGUAGE plpgsql;
 ```
@@ -168,9 +172,13 @@ RETURNS TABLE(
   player varchar(30),
   Country_player varchar(30) ) AS $$
   BEGIN
-  ...
-  YOUR CODE
-  ...
+  IF input_id_team NOT IN (SELECT id_team FROM Team) THEN
+			RAISE EXCEPTION 'This Team does not exist';
+  END IF;
+  RETURN QUERY
+  SELECT Players.Name, Players.Country FROM Players
+    	INNER JOIN Players_Teams PT on Players.id_player = PT.id_player
+   WHERE PT.id_team = $1;
  END;
    $$ LANGUAGE plpgsql;
  ```
