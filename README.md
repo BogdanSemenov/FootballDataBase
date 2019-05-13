@@ -1,6 +1,6 @@
 # База Данных - Футбольный турнир
 
-### ER-модель
+### Логическая модель
 
 
 ![#f03c15](https://placehold.it/15/f03c15/000000?text=+) `PRIMARY KEY`
@@ -9,7 +9,7 @@
 
 ![Screenshot](ER-model.png)
 
-### Логическая модель
+### Физическая модель
 
 ![Screenshot](LogicModel.PNG)
 
@@ -118,6 +118,41 @@ CREATE TABLE Game_statistic (
 );
 ```
 В данной таблице после заполнения содержится 14 полей. 
+
+### Описание представлений(view)
+
+##### 1. View возвращает топ-5 игроков с самыми высокими зарплатами на турнире, их страну и саму зарплату.
+```SQL
+CREATE VIEW topSalaries AS
+	(
+	SELECT *
+	FROM (SELECT Name,
+		     Country,
+		     Salary,
+		     row_number() OVER (ORDER BY Salary DESC)
+			AS top_5
+		FROM Players) AS Q
+	WHERE top_5 < 6
+	);
+```
+
+Это представление нужно для того, чтобы следить за ситуацией на рынке игроков. Владельцам клубов важно понимать сколько получают
+на данный момент самые высокооплачиваемые игроки.
+
+##### 2. View выводит ироков из Англии, их нынешний клуб и дату начала карьеры в этом клубе.
+```SQL
+CREATE VIEW EnglishPlayers AS
+	(
+	SELECT P.Name, T.Name as Team, PT.DateStart
+	  FROM Team T
+		INNER JOIN Players_Teams PT on T.id_team = PT.id_team
+		INNER JOIN Players P on PT.id_player = P.id_player
+	  WHERE P.Country = 'England'
+	    AND PT.DateEnd is NULL
+	);
+```
+
+Это представление нужно для изучения футбольной карьеры английских игроков, так как они очень перспективные.
 
 ### Описание триггеров
 
